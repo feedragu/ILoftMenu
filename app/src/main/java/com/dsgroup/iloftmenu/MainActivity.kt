@@ -16,7 +16,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
+import java.io.IOException
 
 
 class MainActivity : AppCompatActivity() {
@@ -76,6 +78,7 @@ class MainActivity : AppCompatActivity() {
 //                println("links $links")
                 for (link in links) {
                     println(" div ${link.text()}")
+                    getImage(link.text())
                 }
                 // clean up resources
             }
@@ -84,6 +87,25 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+}
+
+fun getImage(imageName : String) {
+    val width = 600
+    val height = 600
+    val webURL = ("https://www.google.com/search?tbm=isch&q="
+            + imageName)
+
+    try {
+        val doc: Document = Jsoup.connect(webURL)
+            .userAgent("Mozilla")
+            .get()
+        val img: Elements = doc.getElementsByTag("img")
+            val src = img[1].absUrl("src")
+            println("src attribute is: $src")
+
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
 }
 
 class MyWebViewClient : WebViewClient() {
