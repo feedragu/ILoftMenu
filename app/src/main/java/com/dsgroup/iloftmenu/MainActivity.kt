@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 val links: Elements = doc.select("pre")
 //                println("links $links")
                 for (link in links) {
-                    println(" div ${link.text()}")
+                    println("pre  ${link.text()}")
                     getImage(link.text())
                 }
                 // clean up resources
