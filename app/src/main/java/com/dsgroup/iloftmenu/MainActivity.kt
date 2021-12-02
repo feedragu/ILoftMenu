@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -24,8 +25,10 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     private lateinit var jInterface: MyJavaScriptInterface
-    private lateinit var url: String
+    private var url =
+        "https://www.tastenpic.com/menu/i-loft-cafe?menu=1&categoryId=5efb2f1875008f0017df1713"
     private lateinit var _binding: ActivityMainBinding
+
 
     @SuppressLint("SetJavaScriptEnabled")
     @RequiresApi(Build.VERSION_CODES.O)
@@ -38,30 +41,36 @@ class MainActivity : AppCompatActivity() {
         jInterface = MyJavaScriptInterface(applicationContext)
         val webView = _binding.webView
         webView.settings.javaScriptEnabled = true
-        webView.addJavascriptInterface(jInterface, "HtmlViewer")
 
-        url =
-            "https://www.tastenpic.com/menu/i-loft-cafe?menu=1&categoryId=5efb2f1875008f0017df1713"
+
 
         webView.webViewClient = MyWebViewClient()
         webView.loadUrl(url)
+        webView.addJavascriptInterface(jInterface, "HtmlViewer")
         println(jInterface.html)
-
 
     }
 
     class MyJavaScriptInterface internal constructor(private val ctx: Context) {
         var html: String? = null
         private var handlerForJavascriptInterface: Handler = Handler()
+        private var alreadyLoaded = false
+
+        private var titleArray: ArrayList<String> = ArrayList<String>()
+        private var descrArray: ArrayList<String> = ArrayList<String>()
+        private var imageArray: ArrayList<String> = ArrayList<String>()
 
         @RequiresApi(Build.VERSION_CODES.O)
         @JavascriptInterface
         fun showHTML(_html: String?) {
             html = _html
-            handlerForJavascriptInterface.post {
-//            println("Page has been loaded in webview. html content :$html")
-                html?.let { getWebsite(it) }
-            }
+            if (!alreadyLoaded)
+                alreadyLoaded = true
+            else
+                handlerForJavascriptInterface.post {
+                    println("Page has been loaded in webview.")
+                    html?.let { getWebsite(it) }
+                }
         }
 
         @RequiresApi(Build.VERSION_CODES.O)
@@ -72,15 +81,38 @@ class MainActivity : AppCompatActivity() {
                 val doc = Jsoup.parse(html)
 
                 val title: String = doc.title()
-//                println("Title $title")
-//                println("HTML $doc")
+
                 val links: Elements = doc.select("pre")
-//                println("links $links")
+                var i = 0
                 for (link in links) {
-                    println("pre  ${link.text()}")
-                    getImage(link.text())
+                    if (link.`is`("pre.meal-description")) {
+                        descrArray.add(link.text())
+
+                    } else if (link.`is`("pre.mb-0")) {
+                        titleArray.add((link.text()))
+                    }
+
+//                    when (link.text()) {
+//                        "PIATTO DEL GIORNO"-> {
+//
+//                        }
+//                    }
+//                    getImage(link.text())
                 }
-                // clean up resources
+
+                for (j in 0..descrArray.size) {
+                    try {
+                        println(
+                            "Title: ${titleArray.get(j)};  Descrizione: ${descrArray.get(j)};  Immagine: ${
+                                imageArray.get(j)
+                            };"
+                        )
+
+                    } catch (e: Exception) {
+//                        println("Title: ${titleArray.get(j)}")
+                    }
+                }
+                GlobalScope.launch(Dispatchers.IO) { getImage(descrArray) }
             }
         }
 
@@ -89,23 +121,30 @@ class MainActivity : AppCompatActivity() {
 
 }
 
-fun getImage(imageName : String) {
+fun getImage(imageName: ArrayList<String>): ArrayList<String> {
+    val imageArray: ArrayList<String> = ArrayList<String>()
     val width = 600
     val height = 600
-    val webURL = ("https://www.google.com/search?tbm=isch&q="
-            + imageName)
+    for (url in imageName) {
+        val webURL = ("https://www.google.com/search?tbm=isch&q="
+                + imageName)
 
-    try {
-        val doc: Document = Jsoup.connect(webURL)
-            .userAgent("Mozilla")
-            .get()
-        val img: Elements = doc.getElementsByTag("img")
+        try {
+            val doc: Document = Jsoup.connect(webURL)
+                .userAgent("Mozilla")
+                .get()
+            val img: Elements = doc.getElementsByTag("img")
             val src = img[1].absUrl("src")
-            println("src attribute is: $src")
+            println(src)
+            imageArray.add(src)
+//        println("src attribute is: $src")
 
-    } catch (e: IOException) {
-        e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
     }
+
+    return imageArray
 }
 
 class MyWebViewClient : WebViewClient() {
@@ -115,10 +154,13 @@ class MyWebViewClient : WebViewClient() {
 
         //Load HTML
         println("finished")
-        webView?.loadUrl(
-            "javascript:window.HtmlViewer.showHTML" +
-                    "('&lt;html&gt;'+document.getElementsByTagName('html')[0].innerHTML+'&lt;/html&gt;');"
-        )
+        Handler(Looper.getMainLooper()).postDelayed({
+            webView?.loadUrl(
+                "javascript:window.HtmlViewer.showHTML" +
+                        "('&lt;html&gt;'+document.getElementsByTagName('html')[0].innerHTML+'&lt;/html&gt;');"
+            )
+        }, 500)
+
 
     }
 }

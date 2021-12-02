@@ -1,8 +1,17 @@
 package com.dsgroup.iloftmenu
 
+import android.annotation.SuppressLint
+import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.dsgroup.iloftmenu.databinding.ActivityMainBinding
+import com.gargoylesoftware.htmlunit.*
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor
+import com.gargoylesoftware.htmlunit.html.HtmlDivision
+import com.gargoylesoftware.htmlunit.html.HtmlPage
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -11,12 +20,17 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import java.io.IOException
+import java.net.URL
 
 
 class MainActivity2 : AppCompatActivity() {
 
+    private var page: HtmlPage? = null
     private lateinit var _binding: ActivityMainBinding
+    val url =
+        "https://www.tastenpic.com/menu/i-loft-cafe?menu=1&categoryId=5efb2f1875008f0017df1713"
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
@@ -30,59 +44,107 @@ class MainActivity2 : AppCompatActivity() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("SetJavaScriptEnabled")
     @DelicateCoroutinesApi
     fun getWebsite() {
         GlobalScope.launch(Dispatchers.IO) {
             val builder = StringBuilder()
 
             try {
-                val doc: Document = Jsoup.connect(
-                    "https://www.tastenpic.com/menu/i-loft-cafe?menu=1&categoryId=" +
-                            "5efb2f1875008f0017df1713"
-                ).get()
-                val title: String = doc.title()
-                println("Title $title")
-                val array: Elements = doc.select("script")
-//                println("links: $links")
-                println("size ${array.size}")
-                for (link in array) {
-                    if (link.toString().contains("__NUXT__")) {
-                        println("Substring ${link.toString().indexesOf("PIATTO DEL GIORNO", true)}")
-                        val ind = link.toString().indexesOf("PIATTO DEL GIORNO", true)
-                    var sub = link.toString()
-                        sub = sub.substring(ind[1])
-                        println("Substring $sub")
-                        println("Substring ${link.toString().indexesOf("LOFTINO", true)}")
-                        val ind2 = link.toString().indexesOf("LOFTINO", true)
-                        var sub2 = link.toString()
-                        sub2 = sub2.substring(ind2[1])
-                        println("Substring $sub2")
-                        println("Substring ${link.toString().indexesOf("Penne", true)}")
-                        val ind3= link.toString().indexesOf("Penne", true)
-                        var sub3 = link.toString()
-                        sub3 = sub3.substring(ind3[1])
-                        println("Substring $sub3")
-                    }
-                }
-            } catch (e: IOException) {
+                val webClient = getConfiguredWebClient()
+                webClient!!.options.isJavaScriptEnabled = true // enable javascript
+
+                webClient.options.isThrowExceptionOnScriptError =
+                    false //even if there is error in js continue
+
+                webClient.waitForBackgroundJavaScript(1000) // important! wait until javascript finishes rendering
+                getNextPage(webClient)
+
+                webClient.addWebWindowListener(MyWebWindowListener(webClient, url))
+                val page: HtmlPage = webClient.getPage(url)
+                val doc = Jsoup.parse(page.asXml())
+                getParse(doc.toString())
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    public fun String?.indexesOf(substr: String, ignoreCase: Boolean = true): List<Int> {
-        val list = mutableListOf<Int>()
-        if (this == null || substr.isBlank()) return list
 
-        var i = -1
-        while(true) {
-            i = indexOf(substr, i + 1, ignoreCase)
-            when (i) {
-                -1 -> return list
-                else -> list.add(i)
+    @Throws(IOException::class)
+    private fun getNextPage(pClient: WebClient) {
+        GlobalScope.launch(Dispatchers.IO) {
+                val apagLanding: HtmlPage = pClient.getPage(url)
+                val anchor = apagLanding.getElementById("__nuxt") as HtmlDivision
+                val apagAllAds = anchor.click<HtmlPage>()
+                try {
+                    println("Pausing for JavaScript execution to return page . . .")
+                    Thread.sleep((1000 * 2).toLong())
+                } catch (e: InterruptedException) {
+                    println(
+                        "InterruptedException encountered (non-critical condition) . . ."
+                    )
+                }
+                page = apagAllAds
+                println("page ${apagAllAds.asXml()}")
+
+
+        }
+    }
+
+    class MyWebWindowListener(val webClient: WebClient, val url: String) : WebWindowListener {
+        override fun webWindowOpened(event: WebWindowEvent?) {
+            TODO("Not yet implemented")
+        }
+
+        override fun webWindowContentChanged(event: WebWindowEvent?) {
+
+        }
+
+        override fun webWindowClosed(event: WebWindowEvent?) {
+            TODO("Not yet implemented")
+        }
+
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @SuppressLint("SetJavaScriptEnabled")
+    @DelicateCoroutinesApi
+    fun getParse(html: String) {
+        GlobalScope.launch(Dispatchers.IO) {
+            val doc = Jsoup.parse(html)
+
+            val title: String = doc.title()
+//                println("Title $title")
+//                println("HTML $doc")
+            val links: Elements = doc.select("pre")
+//                println("links $links")
+            for (link in links) {
+                println("pre  ${link.text()}")
+//                getImage(link.text())
             }
+            // clean up resources
         }
     }
 
 
+
+    @SuppressLint("SetJavaScriptEnabled")
+    private fun getConfiguredWebClient(): WebClient? {
+        var aClient: WebClient? = null
+        aClient = WebClient(BrowserVersion.CHROME)
+
+        aClient.waitForBackgroundJavaScript((3 * 1000).toLong()) // Experimental API: May be changed in next release and may not yet work perfectly!
+        aClient.options.isCssEnabled = true
+        aClient.options.isJavaScriptEnabled = true
+        aClient.ajaxController = NicelyResynchronizingAjaxController()
+
+        return aClient
+    }
+
 }
+
+
+
