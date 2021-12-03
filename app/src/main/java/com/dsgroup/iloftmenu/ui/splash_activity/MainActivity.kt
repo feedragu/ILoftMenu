@@ -26,6 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var jInterface: MyJavaScriptInterface
     private lateinit var mainViewModel: MainViewModel
+    private val HOST_IP = "2.35.2.221"
 
     private var url =
         "https://www.tastenpic.com/menu/i-loft-cafe?menu=1&categoryId=5efb2f1875008f0017df1713"
@@ -192,8 +193,7 @@ class MyWebViewClient : WebViewClient() {
         println("finished")
         Handler(Looper.getMainLooper()).postDelayed({
             webView?.loadUrl(
-                "javascript:window.HtmlViewer.showHTML" +
-                        "('&lt;html&gt;'+document.getElementsByTagName('html')[0].innerHTML+'&lt;/html&gt;');"
+                "javascript:window.HtmlViewer.showHTML('&lt;html&gt;'+document.getElementsByTagName('html')[0].innerHTML+'&lt;/html&gt;');"
             )
         }, 500)
 

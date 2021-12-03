@@ -2,6 +2,7 @@ package com.dsgroup.iloftmenu.ui.menu_activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dsgroup.iloftmenu.R
 import com.dsgroup.iloftmenu.adapter.MenuListAdapter
@@ -12,6 +13,7 @@ import com.google.android.material.snackbar.Snackbar
 class MenuActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMenuBinding
+    private lateinit var menuViewModel: MenuViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +21,14 @@ class MenuActivity : AppCompatActivity() {
         binding = ActivityMenuBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val menuList : ArrayList<MenuElement> = intent.extras?.get("MenuList") as ArrayList<MenuElement>
+        menuViewModel =
+            ViewModelProvider(
+                this,
+                MenuViewModelFactory()
+            )[MenuViewModel::class.java]
+
+        val menuList: ArrayList<MenuElement> =
+            intent.extras?.get("MenuList") as ArrayList<MenuElement>
 
         binding.layoutScrolling.recyclerView?.layoutManager = LinearLayoutManager(this)
 
