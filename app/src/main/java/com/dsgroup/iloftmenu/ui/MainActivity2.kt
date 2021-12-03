@@ -1,15 +1,12 @@
-package com.dsgroup.iloftmenu
+package com.dsgroup.iloftmenu.ui
 
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.dsgroup.iloftmenu.databinding.ActivityMainBinding
 import com.gargoylesoftware.htmlunit.*
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor
 import com.gargoylesoftware.htmlunit.html.HtmlDivision
 import com.gargoylesoftware.htmlunit.html.HtmlPage
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -17,10 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import java.io.IOException
-import java.net.URL
 
 
 class MainActivity2 : AppCompatActivity() {
@@ -36,10 +31,10 @@ class MainActivity2 : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         val view = _binding.root
         setContentView(view)
-
-        _binding.getBtn.setOnClickListener {
-            getWebsite()
-        }
+//
+//        _binding.getBtn.setOnClickListener {
+//            getWebsite()
+//        }
 
 
     }

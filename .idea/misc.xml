@@ -3,7 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/federicor/Desktop/DSGroup_Projects/menu_application/app/src/main/res/layout/activity_main.xml" value="0.11904761904761904" />
+        <entry key="..\:/Users/federicor/Desktop/DSGroup_Projects/menu_application/app/src/main/res/drawable/rounded_background.xml" value="0.2703125" />
+        <entry key="..\:/Users/federicor/Desktop/DSGroup_Projects/menu_application/app/src/main/res/layout/activity_main.xml" value="0.20512820512820512" />
+        <entry key="..\:/Users/federicor/Desktop/DSGroup_Projects/menu_application/app/src/main/res/layout/activity_menu.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/federicor/Desktop/DSGroup_Projects/menu_application/app/src/main/res/layout/content_scrolling.xml" value="0.25416666666666665" />
+        <entry key="..\:/Users/federicor/Desktop/DSGroup_Projects/menu_application/app/src/main/res/layout/text_row_item.xml" value="0.25416666666666665" />
         <entry key="..\:/Users/ragus/StudioProjects/ILoftMenu_git/app/src/main/res/layout/activity_main.xml" value="0.27708333333333335" />
       </map>
     </option>
