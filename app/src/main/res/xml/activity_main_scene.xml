@@ -6,7 +6,9 @@
     <Transition
         motion:constraintSetEnd="@+id/end"
         motion:constraintSetStart="@id/start"
-        motion:duration="1000">
+        motion:duration="1000"
+        motion:motionInterpolator="overshoot"
+        motion:autoTransition="animateToEnd">
        <KeyFrameSet>
        </KeyFrameSet>
     </Transition>
@@ -15,5 +17,15 @@
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
+        <Constraint
+            android:id="@+id/guideline2"
+            motion:layout_constraintGuide_percent="0.40"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <Constraint
+            android:id="@+id/guideline3"
+            motion:layout_constraintGuide_percent="0.60"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </ConstraintSet>
 </MotionScene>

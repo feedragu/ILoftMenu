@@ -56,16 +56,17 @@ class MainActivity : AppCompatActivity() {
         mainViewModel.menuList.observe(this, {
             println("list changed")
         })
-        mainViewModel.counter.observe(this, {
+        mainViewModel.counter.observe(this) {
             println("endLoadingImage $it")
-            if(it == mainViewModel.descrArray.size && it != 0) {
-                var intenttest = Intent(this,MenuActivity::class.java)
-                intenttest.putExtra("MenuList" ,
+            if (it == mainViewModel.descrArray.size && it != 0) {
+                var intenttest = Intent(this, MenuActivity::class.java)
+                intenttest.putExtra(
+                    "MenuList",
                     mainViewModel.menuList.value as ArrayList<MenuElement>
                 )
                 startActivity(intenttest)
             }
-        })
+        }
 
 
         webView.webViewClient = MyWebViewClient()
@@ -116,6 +117,10 @@ class MainActivity : AppCompatActivity() {
                         println("Descrizione2: ${link.text()};")
 
                     } else if (link.`is`("pre.mb-0")) {
+                        if(link.text().contains("ROSSO AL CALICE")){
+                            mainViewModel.descrArray.add("Refosco terre passeri montepulciano d'abruzzo")
+
+                        }
                         mainViewModel.titleArray.add((link.text()))
                         println("Title2: ${link.text()};")
                     }

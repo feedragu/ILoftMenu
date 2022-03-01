@@ -1,5 +1,7 @@
 package com.dsgroup.iloftmenu.ui.menu_activity
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -8,7 +10,7 @@ import com.dsgroup.iloftmenu.R
 import com.dsgroup.iloftmenu.adapter.MenuListAdapter
 import com.dsgroup.iloftmenu.databinding.ActivityMenuBinding
 import com.dsgroup.iloftmenu.model.MenuElement
-import com.google.android.material.snackbar.Snackbar
+
 
 class MenuActivity : AppCompatActivity() {
 
@@ -41,8 +43,8 @@ class MenuActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         binding.toolbarLayout.title = title
         binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            val intentDial = Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + "02 2708 0836"))
+            startActivity(intentDial)
         }
     }
 }

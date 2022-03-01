@@ -6,8 +6,9 @@ plugins {
 
 }
 
-def version = 1
+def version = 2
 def vName = "00.01.0" + version
+def appName = "ILoftMenu"
 
 android {
     compileSdk 31
